@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>entry</key>
+	<dict>
+		<key>cell</key>
+		<string>PSLinkCell</string>
+		<key>icon</key>
+		<string>/Applications/MobileMail.app/otherAccountIcon.png</string>
+		<key>label</key>
+		<string>Mailto Opener</string>
+	</dict>
+	<key>title</key>
+	<string>Mailto Opener</string>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>isStaticText</key>
+			<true/>
+			<key>label</key>
+			<string></string>
+			<key>footerText</key>
+			<string>Not all parameters are supported by these apps and functions may be limited.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>key</key>
+			<string>PreferedMailApp</string>
+			<key>label</key>
+			<string>Prefered Mail App</string>
+			<key>validTitles</key>
+			<array>
+				<string>Mail</string>
+				<string>MailComposeView</string>
+				<string>Gmail</string>
+				<string>Sparrow</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+			</array>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>me.qusic.mailtoopener</string>
+			<key>PostNotification</key>
+			<string>me.qusic.mailtoopener.preferencesChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>© 2014 Qusic
+Twitter : @QusicS</string>
+		</dict>
+	</array>
+</dict>
+</plist>

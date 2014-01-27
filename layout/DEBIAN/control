@@ -1,0 +1,14 @@
+Package: me.qusic.mailtoopener
+Version: 0.2
+Section: Tweaks
+Maintainer: BigBoss <bigboss@thebigboss.org>
+Depends: firmware (>= 5.0), mobilesubstrate, preferenceloader
+Architecture: iphoneos-arm
+Name: MailtoOpener
+Description: Open mailto URL in in-app composer
+Sponsor: thebigboss.org <http://thebigboss.org>
+Author: Qusic <QusicS@Me.com>
+Tag: purpose::extension
+Depiction: http://moreinfo.thebigboss.org/moreinfo/depiction.php?file=mailtoopenerDp
+dev: qusic
+homepage: http://moreinfo.thebigboss.org/moreinfo/depiction.php?file=mailtoopenerDp
