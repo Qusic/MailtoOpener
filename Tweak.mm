@@ -3,38 +3,45 @@
 #import <CaptainHook.h>
 #define PreferencesPlist @"/var/mobile/Library/Preferences/me.qusic.mailtoopener.plist"
 #define PreferencesNotification "me.qusic.mailtoopener.preferencesChanged"
-#define iOS7() (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_7_0)
+
 typedef NS_ENUM(NSInteger, MailApp) {
     Mail = 0,
     MailComposeView,
     Gmail,
     Sparrow
 };
+
 static MailApp PreferedMailApp;
 static MFMailComposeViewController *MailComposeViewController;
 static id<MFMailComposeViewControllerDelegate> MailComposeViewDelegate;
 static UIWindow *PresentedWindow;
+
 @interface UIWindow (Private)
 + (UIWindow *)keyWindow;
 @end
+
 @interface NSString (URLCoding)
 - (NSString *)MailtoOpener_URLEncodedString;
 - (NSString *)MailtoOpener_URLDecodedString;
 @end
+
 @interface MFMailComposeViewController (MailtoOpener)
 - (void)MailtoOpener_present;
 - (void)MailtoOpener_dismiss;
 @end
+
 __attribute__((visibility("hidden")))
 @interface _MailtoOpenerMailComposeViewControllerDelegate : NSObject <MFMailComposeViewControllerDelegate>
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error;
 @end
+
 @implementation NSString (MailtoOpener)
 - (NSString *)MailtoOpener_URLEncodedString
 { return CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)self, NULL, CFSTR("!*'();:@&=+$,/?%#[]"),kCFStringEncodingUTF8)); }
 - (NSString *)MailtoOpener_URLDecodedString
 { return (__bridge_transfer NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault, (__bridge CFStringRef)self, CFSTR(""), kCFStringEncodingUTF8); }
 @end
+
 @implementation MFMailComposeViewController (MailtoOpener)
 - (void)MailtoOpener_present
 {
@@ -52,7 +59,7 @@ __attribute__((visibility("hidden")))
         PresentedWindow.frame = frame;
     }];
 }
--(void)MailtoOpener_dismiss
+- (void)MailtoOpener_dismiss
 {
     CGRect frame = PresentedWindow.frame;
     CGFloat height = frame.size.height;
@@ -67,12 +74,14 @@ __attribute__((visibility("hidden")))
     }];
 }
 @end
+
 @implementation _MailtoOpenerMailComposeViewControllerDelegate
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
     [controller MailtoOpener_dismiss];
 }
 @end
+
 static NSDictionary *parametersFromMailtoURL(NSURL *url)
 {
     NSMutableDictionary *parameterDictionary = nil;
@@ -95,9 +104,8 @@ static NSDictionary *parametersFromMailtoURL(NSURL *url)
     }
     return parameterDictionary;
 }
-CHDeclareClass(SpringBoard);
-CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags, activationHandler, id, handler)
-{
+
+static BOOL handleURL(NSURL *url) {
     if ([url.scheme isEqualToString:@"mailto"]) {
         NSDictionary *parameters = parametersFromMailtoURL(url);
         NSString *recipient = parameters[@"recipient"];
@@ -105,8 +113,7 @@ CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, displa
         NSString *body = parameters[@"body"];
         switch (PreferedMailApp) {
             case Mail: {
-                CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags, activationHandler, handler);
-                break;
+                return NO;
             }
             case MailComposeView: {
                 MailComposeViewController = [[MFMailComposeViewController alloc]init];
@@ -114,80 +121,62 @@ CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, displa
                 [MailComposeViewController setSubject:subject];
                 [MailComposeViewController setMessageBody:body isHTML:NO];
                 [MailComposeViewController MailtoOpener_present];
-                break;
+                return YES;
             }
             case Gmail: {
                 NSString *newURL = [NSString stringWithFormat:@"googlegmail:///co?subject=%@&body=%@&to=%@",subject,body,recipient];
                 [[UIApplication sharedApplication]openURL:[NSURL URLWithString:newURL]];
-                break;
+                return YES;
             }
             case Sparrow: {
                 NSString *newURL = [NSString stringWithFormat:@"sparrow:%@",recipient];
                 [[UIApplication sharedApplication]openURL:[NSURL URLWithString:newURL]];
-                break;
+                return YES;
             }
             default: {
-                CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags, activationHandler, handler);
-                break;
+                return NO;
             }
         }
     } else {
+        return NO;
+    }
+}
+
+CHDeclareClass(SpringBoard);
+CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, activationContext, id, context, activationHandler, id, handler)
+{
+    if (!handleURL(url)) {
+        CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, activationContext, context, activationHandler, handler);
+    }
+}
+
+CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags, activationHandler, id, handler)
+{
+    if (!handleURL(url)) {
         CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags, activationHandler, handler);
     }
 }
+
 CHOptimizedMethod(5, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags)
 {
-    if ([url.scheme isEqualToString:@"mailto"]) {
-        NSDictionary *parameters = parametersFromMailtoURL(url);
-        NSString *recipient = parameters[@"recipient"];
-        NSString *subject = parameters[@"subject"];
-        NSString *body = parameters[@"body"];
-        switch (PreferedMailApp) {
-            case Mail: {
-                CHSuper(5, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags);
-                break;
-            }
-            case MailComposeView: {
-                MailComposeViewController = [[MFMailComposeViewController alloc]init];
-                [MailComposeViewController setToRecipients:@[recipient]];
-                [MailComposeViewController setSubject:subject];
-                [MailComposeViewController setMessageBody:body isHTML:NO];
-                [MailComposeViewController MailtoOpener_present];
-                break;
-            }
-            case Gmail: {
-                NSString *newURL = [NSString stringWithFormat:@"googlegmail:///co?subject=%@&body=%@&to=%@",subject,body,recipient];
-                [[UIApplication sharedApplication]openURL:[NSURL URLWithString:newURL]];
-                break;
-            }
-            case Sparrow: {
-                NSString *newURL = [NSString stringWithFormat:@"sparrow:%@",recipient];
-                [[UIApplication sharedApplication]openURL:[NSURL URLWithString:newURL]];
-                break;
-            }
-            default: {
-                CHSuper(5, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags);
-                break;
-            }
-        }
-    } else {
+    if (!handleURL(url)) {
         CHSuper(5, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags);
     }
 }
+
 static void loadPreferences(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
 	NSDictionary *preferences = [NSDictionary dictionaryWithContentsOfFile:PreferencesPlist];
     PreferedMailApp = [preferences[@"PreferedMailApp"]integerValue];
 }
+
 CHConstructor
 {
 	@autoreleasepool {
         CHLoadLateClass(SpringBoard);
-        if (iOS7()) {
-            CHHook(6, SpringBoard, _openURLCore, display, animating, sender, additionalActivationFlags, activationHandler);
-        } else {
-            CHHook(5, SpringBoard, _openURLCore, display, animating, sender, additionalActivationFlags);
-        }
+        CHHook(6, SpringBoard, _openURLCore, display, animating, sender, activationContext, activationHandler);
+        CHHook(6, SpringBoard, _openURLCore, display, animating, sender, additionalActivationFlags, activationHandler);
+        CHHook(5, SpringBoard, _openURLCore, display, animating, sender, additionalActivationFlags);
         
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, loadPreferences, CFSTR(PreferencesNotification), NULL, CFNotificationSuspensionBehaviorCoalesce);
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(PreferencesNotification), NULL, NULL, TRUE);
