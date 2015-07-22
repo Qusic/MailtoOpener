@@ -34,32 +34,23 @@
 			<string>PreferedMailApp</string>
 			<key>label</key>
 			<string>Prefered Mail App</string>
-			<key>validTitles</key>
+			<key>validValues</key>
 			<array>
 				<string>Mail</string>
 				<string>MailComposeView</string>
 				<string>Gmail</string>
 				<string>Sparrow</string>
 			</array>
-			<key>validValues</key>
-			<array>
-				<integer>0</integer>
-				<integer>1</integer>
-				<integer>2</integer>
-				<integer>3</integer>
-			</array>
 			<key>default</key>
-			<integer>0</integer>
+            <string>Mail</string>
 			<key>defaults</key>
 			<string>me.qusic.mailtoopener</string>
-			<key>PostNotification</key>
-			<string>me.qusic.mailtoopener.preferencesChanged</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>© 2014 Qusic
+			<string>© 2015 Qusic
 Twitter : @QusicS</string>
 		</dict>
 	</array>
