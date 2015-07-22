@@ -7,7 +7,7 @@
 		<key>cell</key>
 		<string>PSLinkCell</string>
 		<key>icon</key>
-		<string>/Applications/MobileMail.app/otherAccountIcon.png</string>
+		<string>MailtoOpener.png</string>
 		<key>label</key>
 		<string>Mailto Opener</string>
 	</dict>
@@ -23,7 +23,8 @@
 			<key>label</key>
 			<string></string>
 			<key>footerText</key>
-			<string>Not all parameters are supported by these apps and functions may be limited.</string>
+            <string>When Custom is selected, enter your custom url in the above field. A self-explanatory example:
+mailto:{{recipient}}?subject={{subject}}&amp;body={{body}}</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -38,13 +39,32 @@
 			<array>
 				<string>Mail</string>
 				<string>MailComposeView</string>
+				<string>Inbox</string>
 				<string>Gmail</string>
-				<string>Sparrow</string>
+				<string>Custom</string>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>Mail</string>
+				<string>MailComposeView</string>
+				<string>Inbox</string>
+				<string>Gmail</string>
+				<string>Custom</string>
 			</array>
 			<key>default</key>
             <string>Mail</string>
 			<key>defaults</key>
 			<string>me.qusic.mailtoopener</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>key</key>
+            <string>CustomURL</string>
+			<key>defaults</key>
+			<string>me.qusic.mailtoopener</string>
+            <key>placeholder</key>
+            <string>Custom URL Scheme</string>
 		</dict>
 		<dict>
 			<key>cell</key>

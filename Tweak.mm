@@ -118,6 +118,12 @@ static BOOL handleURL(NSURL *url) {
             return YES;
         }
         if ([app isEqualToString:@"Custom"]) {
+            NSString *newURL = [preferences stringForKey:@"CustomURL"];
+            newURL = [newURL stringByReplacingOccurrencesOfString:@"{{recipient}}" withString:recipient];
+            newURL = [newURL stringByReplacingOccurrencesOfString:@"{{subject}}" withString:subject];
+            newURL = [newURL stringByReplacingOccurrencesOfString:@"{{body}}" withString:body];
+            [[UIApplication sharedApplication]openURL:[NSURL URLWithString:newURL]];
+            return YES;
         }
     }
     return NO;
