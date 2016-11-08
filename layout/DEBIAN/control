@@ -1,5 +1,5 @@
 Package: me.qusic.mailtoopener
-Version: 0.3
+Version: 0.4
 Section: Tweaks
 Maintainer: BigBoss <bigboss@thebigboss.org>
 Depends: firmware (>= 5.0), mobilesubstrate, preferenceloader
