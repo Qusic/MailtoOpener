@@ -6,8 +6,7 @@
 + (UIWindow *)keyWindow;
 @end
 
-__attribute__((visibility("hidden")))
-@interface _MailtoOpenerMailComposeViewControllerDelegate : NSObject <MFMailComposeViewControllerDelegate>
+@interface MailtoOpenerMailComposeViewControllerDelegate : NSObject <MFMailComposeViewControllerDelegate>
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error;
 @end
 
@@ -20,7 +19,7 @@ static UIWindow *mailComposeWindow;
 static void presentMailComposeView(NSString *recipient, NSString *subject, NSString *body) {
     if (mailComposeController == nil) {
         mailComposeController = [[MFMailComposeViewController alloc]init];
-        mailComposeDelegate = [[_MailtoOpenerMailComposeViewControllerDelegate alloc]init];
+        mailComposeDelegate = [[MailtoOpenerMailComposeViewControllerDelegate alloc]init];
         mailComposeController.mailComposeDelegate = mailComposeDelegate;
         [mailComposeController setToRecipients:@[recipient]];
         [mailComposeController setSubject:subject];
@@ -63,11 +62,12 @@ static NSString *stringURLDecode(NSString *string) {
     return (__bridge_transfer NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault, (__bridge CFStringRef)string, CFSTR(""), kCFStringEncodingUTF8);
 }
 
-@implementation _MailtoOpenerMailComposeViewControllerDelegate
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
+@implementation MailtoOpenerMailComposeViewControllerDelegate
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
     dismissMailComposeView();
 }
+
 @end
 
 static NSDictionary *parametersFromMailtoURL(NSURL *url) {
@@ -97,9 +97,9 @@ static BOOL handleURL(NSURL *url) {
     if ([url.scheme isEqualToString:@"mailto"]) {
         NSString *app = [preferences stringForKey:@"PreferedMailApp"];
         NSDictionary *parameters = parametersFromMailtoURL(url);
-        NSString *recipient = parameters[@"recipient"];
-        NSString *subject = parameters[@"subject"];
-        NSString *body = parameters[@"body"];
+        NSString *recipient = parameters[@"recipient"] ?: @"";
+        NSString *subject = parameters[@"subject"] ?: @"";
+        NSString *body = parameters[@"body"] ?: @"";
         if ([app isEqualToString:@"MailComposeView"]) {
             presentMailComposeView(recipient, subject, body);
             return YES;
@@ -131,37 +131,32 @@ static BOOL handleURL(NSURL *url) {
 
 CHDeclareClass(SpringBoard);
 
-CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, activationSettings, id, settings, withResult, id, result)
-{
+CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, activationSettings, id, settings, withResult, id, result) {
     if (!handleURL(url)) {
         CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, activationSettings, settings, withResult, result);
     }
 }
 
-CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, activationContext, id, context, activationHandler, id, handler)
-{
+CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, activationContext, id, context, activationHandler, id, handler) {
     if (!handleURL(url)) {
         CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, activationContext, context, activationHandler, handler);
     }
 }
 
-CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags, activationHandler, id, handler)
-{
+CHOptimizedMethod(6, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags, activationHandler, id, handler) {
     if (!handleURL(url)) {
         CHSuper(6, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags, activationHandler, handler);
     }
 }
 
-CHOptimizedMethod(5, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags)
-{
+CHOptimizedMethod(5, self, void, SpringBoard, _openURLCore, NSURL *, url, display, id, display, animating, BOOL, animating, sender, id, sender, additionalActivationFlags, id, flags) {
     if (!handleURL(url)) {
         CHSuper(5, SpringBoard, _openURLCore, url, display, display, animating, animating, sender, sender, additionalActivationFlags, flags);
     }
 }
 
-CHConstructor
-{
-	@autoreleasepool {
+CHConstructor {
+    @autoreleasepool {
         preferences = [[NSUserDefaults alloc]initWithSuiteName:globalIdentifier];
         CHLoadLateClass(SpringBoard);
         CHHook(6, SpringBoard, _openURLCore, display, animating, sender, activationSettings, withResult);
