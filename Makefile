@@ -12,3 +12,6 @@ export INSTALL_TARGET_PROCESSES = SpringBoard
 
 include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
+
+internal-stage::
+	$(ECHO_NOTHING)pref="$(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences" && mkdir -p "$$pref" && cp MailtoOpenerPreferences.plist "$$pref/MailtoOpener.plist" && cp *.png "$$pref"$(ECHO_END)
