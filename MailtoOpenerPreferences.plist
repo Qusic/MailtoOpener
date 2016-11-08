@@ -70,8 +70,7 @@ mailto:{{recipient}}?subject={{subject}}&amp;body={{body}}</string>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>© 2015 Qusic
-Twitter : @QusicS</string>
+			<string>MailtoOpener © Qusic</string>
 		</dict>
 	</array>
 </dict>
